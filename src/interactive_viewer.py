@@ -81,9 +81,11 @@ def display_selected_columns(args):
             display_row_info(df, idx, graded_count, skipped_count, total_elements)
 
             print("\n" + get_input_options_description())
+            print("\nskipped_rows", skipped_rows)
 
             # Wait for user input
             user_input = input()
+
 
             while user_input.lower() not in ['y', 'n', 's', 'b', 'q', '']:
                 # Keep waiting for a valid input
@@ -103,7 +105,7 @@ def display_selected_columns(args):
                 # Go back to the previous row
                 if current_idx > 0:
                     current_idx -= 1
-                    if skipped_rows[current_idx - 1] == False:
+                    if skipped_rows[current_idx] == False:
                         graded_count -= 1
                     else:
                         skipped_count -= 1
