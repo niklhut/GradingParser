@@ -1,5 +1,5 @@
 import argparse
-from csv_interactive_viewer import display_selected_columns
+from interactive_viewer import display_selected_columns
 
 def main():
     parser = argparse.ArgumentParser(description="CSV Viewer with Interaction")
