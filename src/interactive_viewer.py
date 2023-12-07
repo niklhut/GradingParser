@@ -3,7 +3,7 @@ import os
 from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 from user_interface import get_input_options_description
-from csv_utils import save_dataframe
+from utils import save_dataframe
 
 def display_row_info(df, idx, graded_count, skipped_count, total_elements):
     os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console
@@ -25,15 +25,21 @@ def display_row_info(df, idx, graded_count, skipped_count, total_elements):
 
 def display_selected_columns(args):
     try:
-        df = pd.read_csv(args.csv_file_path, header=0, sep=';', lineterminator='\r')
+        if args.file_path.endswith('.xlsx'):
+            df = pd.read_excel(args.file_path, header=0)
+        elif args.file_path.endswith('.csv'):
+            df = pd.read_csv(args.file_path, header=0, sep=';', lineterminator='\r')
+        else:
+            print("Error: File format not supported.")
+            return
     except FileNotFoundError:
-        print(f"Error: File '{args.csv_file_path}' not found.")
+        print(f"Error: File '{args.file_path}' not found.")
         return
     except pd.errors.EmptyDataError:
-        print("CSV file is empty.")
+        print("Table file is empty.")
         return
     except pd.errors.ParserError as e:
-        print(f"Error parsing CSV file: {e}")
+        print(f"Error parsing Table: {e}")
         return
 
     # Validate start_row and end_row
@@ -87,7 +93,7 @@ def display_selected_columns(args):
             if user_input.lower() == 'q':
                 print("Saving and quitting...")
                 # Save the modified DataFrame back to the CSV file
-                executor.submit(save_dataframe, df.copy(), args.csv_file_path)
+                executor.submit(save_dataframe, df.copy(), args.file_path)
                 return
             elif user_input.lower() == 's':
                 skipped_rows.append(True)
@@ -114,12 +120,12 @@ def display_selected_columns(args):
                 df.at[idx, 'valid'] = 'n'
             
             # Save the modified DataFrame back to the CSV file
-            executor.submit(save_dataframe, df.copy(), args.csv_file_path)
+            executor.submit(save_dataframe, df.copy(), args.file_path)
 
             current_idx += 1
 
     # Save the modified DataFrame back to the CSV file
-    save_dataframe(df, args.csv_file_path)
+    save_dataframe(df, args.file_path)
 
     os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console
     # Display the counter at the top
