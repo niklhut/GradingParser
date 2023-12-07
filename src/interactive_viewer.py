@@ -107,6 +107,7 @@ def display_selected_columns(args):
                         graded_count -= 1
                     else:
                         skipped_count -= 1
+                    skipped_rows.pop()
                 continue
 
             # Update DataFrame based on user input
