@@ -46,6 +46,9 @@ def display_selected_columns(args):
     # And set end_row to the last row if it is not specified
     end_row = min(args.end - 1, len(df)) if args.end else len(df)
 
+    # Skip graded
+    skip_graded = args.skip_graded
+
     # Counter for graded and skipped x rows
     graded_count = 0
     skipped_count = 0
@@ -60,6 +63,13 @@ def display_selected_columns(args):
     with ThreadPoolExecutor() as executor:
         while current_idx < len(idx_list):
             idx = idx_list[current_idx]
+
+            if skip_graded and (df.at[idx, 'valid'] == 'y' or df.at[idx, 'valid'] == 'n'):
+                # Skip already graded rows
+                graded_count += 1
+                current_idx += 1
+                continue
+
             display_row_info(df, idx, graded_count, skipped_count, total_elements)
 
             print("\n" + get_input_options_description())
