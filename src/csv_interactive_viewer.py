@@ -52,7 +52,9 @@ def display_selected_columns(args):
     # Counter for graded and skipped x rows
     graded_count = 0
     skipped_count = 0
-    graded_previous_row = False
+
+    # List to keep track of skipped and graded rows
+    skipped_rows = []
 
     # Count and total number of elements to grade before the valid row
     total_elements = end_row - start_row
@@ -88,14 +90,14 @@ def display_selected_columns(args):
                 executor.submit(save_dataframe, df.copy(), args.csv_file_path)
                 return
             elif user_input.lower() == 's':
-                graded_previous_row = False
+                skipped_rows.append(True)
                 skipped_count += 1
                 print("Skipping row...")
             elif user_input.lower() == 'b':
                 # Go back to the previous row
                 if current_idx > 0:
                     current_idx -= 1
-                    if graded_previous_row:
+                    if skipped_rows[idx - 1] == False:
                         graded_count -= 1
                     else:
                         skipped_count -= 1
@@ -103,11 +105,11 @@ def display_selected_columns(args):
 
             # Update DataFrame based on user input
             if user_input.lower() == 'y':
-                graded_previous_row = True
+                skipped_rows.append(False)
                 graded_count += 1
                 df.at[idx, 'valid'] = 'y'
             elif user_input.lower() == 'n':
-                graded_previous_row = True
+                skipped_rows.append(False)
                 graded_count += 1
                 df.at[idx, 'valid'] = 'n'
             
