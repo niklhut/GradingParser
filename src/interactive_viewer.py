@@ -103,7 +103,7 @@ def display_selected_columns(args):
                 # Go back to the previous row
                 if current_idx > 0:
                     current_idx -= 1
-                    if skipped_rows[idx - 1] == False:
+                    if skipped_rows[current_idx - 1] == False:
                         graded_count -= 1
                     else:
                         skipped_count -= 1
