@@ -84,8 +84,6 @@ def display_selected_columns(args):
 
             display_row_info(df, idx, graded_count, skipped_count, total_elements)
 
-            back_flag = max(back_flag - 1, 0)
-
             print("\n" + get_input_options_description())
 
             # Wait for user input
@@ -108,7 +106,7 @@ def display_selected_columns(args):
             elif user_input.lower() == 'b':
                 # Go back to the previous row
                 if current_idx > 0:
-                    back_flag += 2 # add two since we already subtracted one
+                    back_flag += 1 # add two since we already subtracted one
                     current_idx -= 1
                     if skipped_rows[current_idx] == False:
                         graded_count -= 1
@@ -116,6 +114,8 @@ def display_selected_columns(args):
                         skipped_count -= 1
                     skipped_rows.pop()
                 continue
+
+            back_flag = max(back_flag - 1, 0)
 
             # Update DataFrame based on user input
             if user_input.lower() == 'y':
