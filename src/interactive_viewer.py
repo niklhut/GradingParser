@@ -62,6 +62,9 @@ def display_selected_columns(args):
     # List to keep track of skipped and graded rows
     skipped_rows = []
 
+    # Flag to save how many times the user went back
+    back_flag = 0
+
     # Count and total number of elements to grade before the valid row
     total_elements = end_row - start_row
 
@@ -72,20 +75,21 @@ def display_selected_columns(args):
         while current_idx < len(idx_list):
             idx = idx_list[current_idx]
 
-            if skip_graded and (df.at[idx, 'valid'] == 'y' or df.at[idx, 'valid'] == 'n'):
+            if back_flag == 0 and skip_graded and (df.at[idx, 'valid'] == 'y' or df.at[idx, 'valid'] == 'n'):
                 # Skip already graded rows
+                skipped_rows.append(False)
                 graded_count += 1
                 current_idx += 1
                 continue
 
             display_row_info(df, idx, graded_count, skipped_count, total_elements)
 
+            back_flag = max(back_flag - 1, 0)
+
             print("\n" + get_input_options_description())
-            print("\nskipped_rows", skipped_rows)
 
             # Wait for user input
             user_input = input()
-
 
             while user_input.lower() not in ['y', 'n', 's', 'b', 'q', '']:
                 # Keep waiting for a valid input
@@ -104,6 +108,7 @@ def display_selected_columns(args):
             elif user_input.lower() == 'b':
                 # Go back to the previous row
                 if current_idx > 0:
+                    back_flag += 2 # add two since we already subtracted one
                     current_idx -= 1
                     if skipped_rows[current_idx] == False:
                         graded_count -= 1
@@ -128,7 +133,7 @@ def display_selected_columns(args):
             current_idx += 1
 
     # Save the modified DataFrame back to the CSV file
-    save_dataframe(df, args.file_path)
+    save_dataframe(df.copy(), args.file_path)
 
     os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console
     # Display the counter at the top
