@@ -1,3 +1,5 @@
+from user_interface import get_input_options_description
+
 def save_dataframe(df, file_path):
 
     # Save the modified DataFrame back to the CSV file
@@ -8,3 +10,13 @@ def save_dataframe(df, file_path):
     else:
         print("Error: File format not supported.")
         return
+    
+def get_user_input():
+    user_input = input()
+
+    while user_input.lower() not in ['y', 'n', 's', 'b', 'q', '']:
+        # Keep waiting for a valid input
+        print("Invalid input. " + get_input_options_description())
+        user_input = input()
+
+    return user_input

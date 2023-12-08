@@ -3,7 +3,7 @@ import os
 from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 from user_interface import get_input_options_description
-from utils import save_dataframe
+from utils import *
 
 def display_row_info(df, idx, graded_count, skipped_count, total_elements):
     os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console
@@ -86,13 +86,8 @@ def display_selected_columns(args):
 
             print("\n" + get_input_options_description())
 
-            # Wait for user input
-            user_input = input()
-
-            while user_input.lower() not in ['y', 'n', 's', 'b', 'q', '']:
-                # Keep waiting for a valid input
-                print("Invalid input. Please press 'Y', 'N', 'S', 'B', 'Q', or 'Enter'.")
-                user_input = input()
+            # Get user input
+            user_input = get_user_input()
 
             if user_input.lower() == 'q':
                 print("Saving and quitting...")
