@@ -74,7 +74,6 @@ class InteractiveViewer:
 
                 print("\n" + get_input_options_description())
 
-                print(f"\n{self.skipped_rows}") 
                 # Get user input
                 user_input = get_user_input()
                 res = self.handle_user_input(user_input, idx)
