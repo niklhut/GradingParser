@@ -36,7 +36,9 @@ In the interactive viewer, you can use the following commands:
 
 Then press `Enter` to confirm your input.
 
-The script will save your progress after every row. If you quit the interactive viewer, you can resume your progress by running the script again with the same arguments, using the `--skip_graded` flag to skip already graded rows.
+The script will create a backup of the original file in the same directory as the original file, with the suffix `.original`. The script will then overwrite the original file with the graded rows.
+
+Your progress will be saved into the initial file after every row. If you quit the interactive viewer, you can resume your progress by running the script again with the same arguments, using the `--skip_graded` flag to skip already graded rows.
 
 To avoid corrupting the data file make sure to not use `Ctrl+C` to quit the interactive viewer, instead use the `q` command.
 
