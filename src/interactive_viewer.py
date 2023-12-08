@@ -74,6 +74,7 @@ class InteractiveViewer:
 
                 print("\n" + get_input_options_description())
 
+                print(f"\n{self.skipped_rows}") 
                 # Get user input
                 user_input = get_user_input()
                 res = self.handle_user_input(user_input, idx)
@@ -98,8 +99,12 @@ class InteractiveViewer:
             print("Saving and quitting...")
             return InteractiveViewer.HandleUserInputResult.QUIT
         elif user_input.lower() == 's':
-            self.skipped_rows.append(True)
-            self.skipped_count += 1
+            if self.df.at[idx, 'valid'] == 'y' or self.df.at[idx, 'valid'] == 'n':
+                self.skipped_rows.append(False)
+                self.graded_count += 1
+            else:
+                self.skipped_rows.append(True)
+                self.skipped_count += 1
             print("Skipping row...")
             return InteractiveViewer.HandleUserInputResult.SKIP
         elif user_input.lower() == 'b':
