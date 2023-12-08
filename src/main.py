@@ -1,6 +1,6 @@
 import argparse
-from interactive_viewer import display_selected_columns
-from backup import create_backup_of_original_file
+from interactive_viewer import InteractiveViewer
+from utils import *
 
 def main():
     parser = argparse.ArgumentParser(description="Table Viewer with Interaction")
@@ -10,8 +10,10 @@ def main():
     parser.add_argument("--skip-graded", action="store_true", help="Skip already graded rows (default: False)")
 
     args = parser.parse_args()
+    check_file_exists(args.file_path)
     create_backup_of_original_file(args.file_path)
-    display_selected_columns(args)
+    viewer = InteractiveViewer(args.file_path, args.start, args.end, args.skip_graded)
+    viewer.display_selected_columns()
 
 if __name__ == "__main__":
     main()

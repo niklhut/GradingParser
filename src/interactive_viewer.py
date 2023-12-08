@@ -4,133 +4,152 @@ from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 from user_interface import get_input_options_description
 from utils import *
+from enum import Enum
 
-def display_row_info(df, idx, graded_count, skipped_count, total_elements):
-    os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console
+class InteractiveViewer:
 
-    name_expected = df.at[idx, "name_expected"]
-    documentation = df.at[idx, "documentation"]
-    valid_status = df.at[idx, "valid"]
+    class HandleUserInputResult(Enum):
+        QUIT = 1
+        SKIP = 2
+        BACK = 3
+        CONTINUE = 4
 
-    # Display the count and total number of elements to grade before the valid row
-    print(f"{Fore.CYAN}Graded rows:{Style.RESET_ALL} {graded_count}/{total_elements} (Skipped: {skipped_count})")
-    if valid_status == 'y' or valid_status == 'n':
-        print(f"{Fore.CYAN}Valid:{Style.RESET_ALL} {Fore.GREEN if valid_status == 'y' else Fore.RED}{valid_status}{Style.RESET_ALL}")
-    else:
-        print("Not yet graded")
+    def __init__(self, file_path, start_row, end_row, skip_graded):
+        self.file_path = file_path
+        self.start_row = start_row
+        self.end_row = end_row
+        self.skip_graded = skip_graded
 
-    # Colorize the output for name_expected and documentation
-    print(f"{Fore.CYAN}Name Expected:{Style.RESET_ALL} {name_expected}")
-    print(f"{Fore.CYAN}Documentation:{Style.RESET_ALL}\n{Fore.GREEN}{documentation}{Style.RESET_ALL}")
+        # Flag to save how many times the user went back
+        self.back_flag = 0
 
-def display_selected_columns(args):
-    try:
-        if args.file_path.endswith('.xlsx'):
-            df = pd.read_excel(args.file_path, header=0)
-        elif args.file_path.endswith('.csv'):
-            df = pd.read_csv(args.file_path, header=0, sep=';', lineterminator='\r')
-        else:
-            print("Error: File format not supported.")
-            return
-    except FileNotFoundError:
-        print(f"Error: File '{args.file_path}' not found.")
-        return
-    except pd.errors.EmptyDataError:
-        print("Table file is empty.")
-        return
-    except pd.errors.ParserError as e:
-        print(f"Error parsing Table: {e}")
-        return
+        # List to keep track of skipped and graded rows
+        self.skipped_rows = []
 
-    # Validate start_row and end_row
-    if args.start < 1 or (args.end and args.end >= len(df) + 2):
-        print("Invalid start_row or end_row.")
-        return
+        # Counter for graded and skipped x rows
+        self.graded_count = 0
+        self.skipped_count = 0
 
-    # Convert to 0-based index
-    start_row = max(args.start - 2, 0)
-    # And set end_row to the last row if it is not specified
-    end_row = min(args.end - 1, len(df)) if args.end else len(df)
+        # Read the file
+        self.df = read_file(file_path)
 
-    # Skip graded
-    skip_graded = args.skip_graded
+        # Validate start_row and end_row
+        self.validate_start_and_end_row()
 
-    # Counter for graded and skipped x rows
-    graded_count = 0
-    skipped_count = 0
+        # Convert to 0-based index
+        self.start_row = max(self.start_row - 2, 0)
+        # And set end_row to the last row if it is not specified
+        self.end_row = min(self.end_row - 1, len(self.df)) if self.end_row else len(self.df)
 
-    # List to keep track of skipped and graded rows
-    skipped_rows = []
+        # Set total number of elements to grade
+        self.total_elements = self.end_row - self.start_row
 
-    # Flag to save how many times the user went back
-    back_flag = 0
+    def validate_start_and_end_row(self):
+        # Validate start_row and end_row
+        if self.start_row < 1 or (self.end_row and self.end_row >= len(self.df) + 2):
+            print("Invalid start_row or end_row.")
+            quit()
 
-    # Count and total number of elements to grade before the valid row
-    total_elements = end_row - start_row
+    def should_skip_row(self, idx):
+        if self.back_flag == 0 and self.skip_graded and (self.df.at[idx, 'valid'] == 'y' or self.df.at[idx, 'valid'] == 'n'):
+            # Skip already graded rows
+            self.skipped_rows.append(False)
+            self.graded_count += 1
+            return True
+        return False
 
-    idx_list = list(df.iloc[start_row:end_row].index)
-    current_idx = 0
+    def display_selected_columns(self):
+        idx_list = list(self.df.iloc[self.start_row:self.end_row].index)
+        self.current_idx = 0
 
-    with ThreadPoolExecutor() as executor:
-        while current_idx < len(idx_list):
-            idx = idx_list[current_idx]
+        with ThreadPoolExecutor() as executor:
+            while self.current_idx < len(idx_list):
+                idx = idx_list[self.current_idx]
 
-            if back_flag == 0 and skip_graded and (df.at[idx, 'valid'] == 'y' or df.at[idx, 'valid'] == 'n'):
-                # Skip already graded rows
-                skipped_rows.append(False)
-                graded_count += 1
-                current_idx += 1
-                continue
+                if self.should_skip_row(idx):
+                    self.current_idx += 1
+                    continue
 
-            display_row_info(df, idx, graded_count, skipped_count, total_elements)
+                self.display_row_info(idx)
 
-            print("\n" + get_input_options_description())
+                print("\n" + get_input_options_description())
 
-            # Get user input
-            user_input = get_user_input()
+                # Get user input
+                user_input = get_user_input()
+                res = self.handle_user_input(user_input, idx)
 
-            if user_input.lower() == 'q':
-                print("Saving and quitting...")
+                if res == InteractiveViewer.HandleUserInputResult.QUIT:
+                    break
+                elif res == InteractiveViewer.HandleUserInputResult.BACK:
+                    continue
+                
+                self.back_flag = max(self.back_flag - 1, 0)
+
                 # Save the modified DataFrame back to the CSV file
-                executor.submit(save_dataframe, df.copy(), args.file_path)
-                return
-            elif user_input.lower() == 's':
-                skipped_rows.append(True)
-                skipped_count += 1
-                print("Skipping row...")
-            elif user_input.lower() == 'b':
-                # Go back to the previous row
-                if current_idx > 0:
-                    back_flag += 1 # add two since we already subtracted one
-                    current_idx -= 1
-                    if skipped_rows[current_idx] == False:
-                        graded_count -= 1
-                    else:
-                        skipped_count -= 1
-                    skipped_rows.pop()
-                continue
+                executor.submit(save_dataframe, self.df.copy(), self.file_path)
 
-            back_flag = max(back_flag - 1, 0)
+                self.current_idx += 1
 
-            # Update DataFrame based on user input
-            if user_input.lower() == 'y':
-                skipped_rows.append(False)
-                graded_count += 1
-                df.at[idx, 'valid'] = 'y'
-            elif user_input.lower() == 'n':
-                skipped_rows.append(False)
-                graded_count += 1
-                df.at[idx, 'valid'] = 'n'
-            
-            # Save the modified DataFrame back to the CSV file
-            executor.submit(save_dataframe, df.copy(), args.file_path)
+        # Save the modified DataFrame
+        self.save_and_finish()
 
-            current_idx += 1
+    def handle_user_input(self, user_input, idx):
+        if user_input.lower() == 'q':
+            print("Saving and quitting...")
+            return InteractiveViewer.HandleUserInputResult.QUIT
+        elif user_input.lower() == 's':
+            self.skipped_rows.append(True)
+            self.skipped_count += 1
+            print("Skipping row...")
+            return InteractiveViewer.HandleUserInputResult.SKIP
+        elif user_input.lower() == 'b':
+            # Go back to the previous row
+            if self.current_idx > 0:
+                self.back_flag += 1 # add two since we already subtracted one
+                self.current_idx -= 1
+                if self.skipped_rows[self.current_idx] == False:
+                    self.graded_count -= 1
+                else:
+                    self.skipped_count -= 1
+                self.skipped_rows.pop()
+            return InteractiveViewer.HandleUserInputResult.BACK
 
-    # Save the modified DataFrame back to the CSV file
-    save_dataframe(df.copy(), args.file_path)
+        # Update DataFrame based on user input
+        if user_input.lower() == 'y':
+            self.skipped_rows.append(False)
+            self.graded_count += 1
+            self.df.at[idx, 'valid'] = 'y'
+        elif user_input.lower() == 'n':
+            self.skipped_rows.append(False)
+            self.graded_count += 1
+            self.df.at[idx, 'valid'] = 'n'        
+        return InteractiveViewer.HandleUserInputResult.CONTINUE
 
-    os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console
-    # Display the counter at the top
-    print(f"{Fore.GREEN}Done!{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}Graded rows:{Style.RESET_ALL} {graded_count}/{total_elements} (Skipped: {skipped_count})")
+    def save_and_finish(self):
+        # Save the modified DataFrame
+        save_dataframe(self.df.copy(), self.file_path)
+
+        os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console
+        # Display the counter at the top
+        print(f"{Fore.GREEN}Done!{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}Graded rows:{Style.RESET_ALL} {self.graded_count}/{self.total_elements} (Skipped: {self.skipped_count})")
+
+
+    def display_row_info(self, idx):
+        os.system('cls' if os.name == 'nt' else 'clear')  # Clear the console
+
+        name_expected = self.df.at[idx, "name_expected"]
+        documentation = self.df.at[idx, "documentation"]
+        valid_status = self.df.at[idx, "valid"]
+
+        # Display the count and total number of elements to grade before the valid row
+        print(f"{Fore.CYAN}Graded rows:{Style.RESET_ALL} {self.graded_count}/{self.total_elements} (Skipped: {self.skipped_count})")
+        if valid_status == 'y' or valid_status == 'n':
+            print(f"{Fore.CYAN}Valid:{Style.RESET_ALL} {Fore.GREEN if valid_status == 'y' else Fore.RED}{valid_status}{Style.RESET_ALL}")
+        else:
+            print("Not yet graded")
+
+        # Colorize the output for name_expected and documentation
+        print(f"{Fore.CYAN}Name Expected:{Style.RESET_ALL} {name_expected}")
+        print(f"{Fore.CYAN}Documentation:{Style.RESET_ALL}\n{Fore.GREEN}{documentation}{Style.RESET_ALL}")
+
