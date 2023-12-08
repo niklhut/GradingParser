@@ -1,4 +1,4 @@
-# Interactive Viewer
+# Grading Parser
 
 This project is a Python script that allows users to interactively view and grade rows in a data file. It supports both Excel (.xlsx) and CSV (.csv) files.
 
@@ -36,9 +36,13 @@ In the interactive viewer, you can use the following commands:
 
 Then press `Enter` to confirm your input.
 
-The script will create a backup of the original file in the same directory as the original file, with the suffix `.original`. The script will then overwrite the original file with the graded rows.
+The script will create a backup of the original file in the same directory as the original file, with the suffix `.original`. 
 
-Your progress will be saved into the initial file after every row. If you quit the interactive viewer, you can resume your progress by running the script again with the same arguments, using the `--skip_graded` flag to skip already graded rows.
+The script will then save the current progress in a temporary csv file (even if the input was an Excel file) with the same name as the original file, but the suffix `.tmp.csv`. 
+
+In the end the script will overwrite the original file with the graded rows. This will always be the same file and file type as the original file.
+
+If you quit the interactive viewer, you can resume your progress by running the script again with the same arguments, using the `--skip_graded` flag to skip already graded rows.
 
 To avoid corrupting the data file make sure to not use `Ctrl+C` to quit the interactive viewer, instead use the `q` command.
 
