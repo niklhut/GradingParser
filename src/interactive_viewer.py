@@ -1,4 +1,3 @@
-import pandas as pd
 import os
 from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
@@ -16,6 +15,8 @@ class InteractiveViewer:
 
     def __init__(self, file_path, start_row, end_row, skip_graded):
         self.file_path = file_path
+        path = Path(file_path)
+        self.csv_file_path = path.stem + '.tmp.csv'
         self.start_row = start_row
         self.end_row = end_row
         self.skip_graded = skip_graded
@@ -86,7 +87,7 @@ class InteractiveViewer:
                 self.back_flag = max(self.back_flag - 1, 0)
 
                 # Save the modified DataFrame back to the CSV file
-                executor.submit(save_dataframe, self.df.copy(), self.file_path)
+                executor.submit(save_dataframe, self.df.copy(), self.csv_file_path)
 
                 self.current_idx += 1
 
