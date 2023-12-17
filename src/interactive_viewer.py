@@ -51,6 +51,10 @@ class InteractiveViewer:
             print("Invalid start_row or end_row.")
             quit()
 
+        if self.end_row and self.end_row < self.start_row:
+            print("end_row must be greater than start_row.")
+            quit()
+
     def should_skip_row(self, idx):
         if self.back_flag == 0 and self.skip_graded and (self.df.at[idx, 'valid'] == 'y' or self.df.at[idx, 'valid'] == 'n'):
             # Skip already graded rows
