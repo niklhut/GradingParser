@@ -117,3 +117,7 @@ __pycache__/
 # Python Jupyter
 *.ipynb_checkpoints
 __pycache__/
+
+# CSV and XLSX files
+*.csv
+*.xlsx
