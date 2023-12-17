@@ -17,7 +17,7 @@ def save_dataframe(df, file_path):
 def get_user_input():
     user_input = input()
 
-    while user_input.lower() not in ['y', 'n', 's', 'b', 'q', '']:
+    while user_input.lower() not in ['y', 'n', 's', 'b', 'q']:
         # Keep waiting for a valid input
         print("Invalid input. " + get_input_options_description())
         user_input = input()
