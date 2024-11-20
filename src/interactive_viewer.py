@@ -124,14 +124,14 @@ class InteractiveViewer:
             return InteractiveViewer.HandleUserInputResult.BACK
 
         # Update DataFrame based on user input
-        if user_input.lower() == 'y':
+        if user_input.lower() == 'y' or user_input.lower() == '1':
             self.skipped_rows.append(False)
             self.graded_count += 1
-            self.df.at[idx, 'valid'] = 'y'
-        elif user_input.lower() == 'n':
+            self.df.at[idx, 'valid'] = '1'
+        elif user_input.lower() == 'n' or user_input.lower() == '0':
             self.skipped_rows.append(False)
             self.graded_count += 1
-            self.df.at[idx, 'valid'] = 'n'
+            self.df.at[idx, 'valid'] = '0'
         return InteractiveViewer.HandleUserInputResult.CONTINUE
 
     def save_and_finish(self):
@@ -153,7 +153,7 @@ class InteractiveViewer:
 
         # Display the count and total number of elements to grade before the valid row
         print(f"{Fore.CYAN}Graded rows:{Style.RESET_ALL} {self.graded_count}/{self.total_elements} (Skipped: {self.skipped_count})")
-        if valid_status == 'y' or valid_status == 'n':
+        if valid_status == '1' or valid_status == '0':
             print(f"{Fore.CYAN}Valid:{Style.RESET_ALL} {Fore.GREEN if valid_status == 'y' else Fore.RED}{valid_status}{Style.RESET_ALL}")
         else:
             print("Not yet graded")

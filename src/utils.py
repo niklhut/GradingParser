@@ -1,4 +1,4 @@
-import pandas as pd 
+import pandas as pd
 from pathlib import Path
 import shutil
 from user_interface import get_input_options_description
@@ -9,7 +9,7 @@ def save_dataframe(df, file_path):
     if file_path.endswith('.xlsx'):
         df.to_excel(file_path, index=False)
     elif file_path.endswith('.csv'):
-        df.to_csv(file_path, sep=';', index=False, lineterminator='\r')
+        df.to_csv(file_path, index=False)
     else:
         print("Error: File format not supported.")
         return
@@ -17,7 +17,7 @@ def save_dataframe(df, file_path):
 def get_user_input():
     user_input = input()
 
-    while user_input.lower() not in ['y', 'n', 's', 'b', 'q']:
+    while user_input.lower() not in ['y', 'n', 's', 'b', 'q', '0', '1']:
         # Keep waiting for a valid input
         print("Invalid input. " + get_input_options_description())
         user_input = input()
@@ -35,7 +35,7 @@ def read_file(file_path):
         if file_path.endswith('.xlsx'):
             df = pd.read_excel(file_path, header=0)
         elif file_path.endswith('.csv'):
-            df = pd.read_csv(file_path, header=0, sep=';', lineterminator='\r')
+            df = pd.read_csv(file_path, header=0, dtype=str)
         else:
             print("Error: File format not supported.")
             quit()
