@@ -87,7 +87,7 @@ class InteractiveViewer:
                     break
                 elif res == InteractiveViewer.HandleUserInputResult.BACK:
                     continue
-                
+
                 self.back_flag = max(self.back_flag - 1, 0)
 
                 # Save the modified DataFrame back to the CSV file
@@ -131,7 +131,7 @@ class InteractiveViewer:
         elif user_input.lower() == 'n':
             self.skipped_rows.append(False)
             self.graded_count += 1
-            self.df.at[idx, 'valid'] = 'n'        
+            self.df.at[idx, 'valid'] = 'n'
         return InteractiveViewer.HandleUserInputResult.CONTINUE
 
     def save_and_finish(self):

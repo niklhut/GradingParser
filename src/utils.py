@@ -13,7 +13,7 @@ def save_dataframe(df, file_path):
     else:
         print("Error: File format not supported.")
         return
-    
+
 def get_user_input():
     user_input = input()
 
