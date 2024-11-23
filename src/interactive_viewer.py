@@ -56,7 +56,7 @@ class InteractiveViewer:
             quit()
 
     def should_skip_row(self, idx):
-        if self.back_flag == 0 and self.skip_graded and (self.df.at[idx, 'valid'] == 'y' or self.df.at[idx, 'valid'] == 'n'):
+        if self.back_flag == 0 and self.skip_graded and (self.df.at[idx, 'valid'] == 'y' or self.df.at[idx, 'valid'] == '1' or self.df.at[idx, 'valid'] == 'n' or self.df.at[idx, 'valid'] == '0'):
             # Skip already graded rows
             self.skipped_rows.append(False)
             self.graded_count += 1
