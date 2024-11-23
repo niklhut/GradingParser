@@ -21,24 +21,30 @@ The script expects the data file to have a header row with the following columns
 Run the script with the following command:
 
 ```bash
+python src/main.py <path_to_file>
+```
+
+Replace `<path_to_file>` with the path to your Excel or CSV file. If you don't want to grade the entire file use the command:
+
+```bash
 python src/main.py <path_to_file> --start <start_row> --end <end_row> --skip_graded
 ```
 
-Replace `<path_to_file>` with the path to your Excel or CSV file, `<start_row>` and `<end_row>` with the range of rows you want to grade. If you don't want to skip already graded rows, you can omit the `--skip_graded` flag.
+Set`<start_row>` and `<end_row>` with the range of rows you want to grade. If you don't want to skip already graded rows, you can omit the `--skip_graded` flag.
 
 In the interactive viewer, you can use the following commands:
 
-- `y`: Mark the current row as valid
-- `n`: Mark the current row as invalid
+- `y` or `1`: Mark the current row as valid
+- `n` or `0`: Mark the current row as invalid
 - `s`: Skip the current row
 - `b`: Go back to the previous row
 - `q`: Quit the interactive viewer
 
 Then press `Enter` to confirm your input.
 
-The script will create a backup of the original file in the same directory as the original file, with the suffix `.original`. 
+The script will create a backup of the original file in the same directory as the original file, with the suffix `.original`.
 
-The script will then save the current progress in a temporary csv file (even if the input was an Excel file) with the same name as the original file, but the suffix `.tmp.csv`. 
+The script will then save the current progress in a temporary csv file (even if the input was an Excel file) with the same name as the original file, but the suffix `.tmp.csv`.
 
 In the end the script will overwrite the original file with the graded rows. This will always be the same file and file type as the original file.
 
