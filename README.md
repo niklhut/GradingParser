@@ -27,10 +27,10 @@ python src/main.py <path_to_file>
 Replace `<path_to_file>` with the path to your Excel or CSV file. If you don't want to grade the entire file use the command:
 
 ```bash
-python src/main.py <path_to_file> --start <start_row> --end <end_row> --skip_graded
+python src/main.py <path_to_file> --start <start_row> --end <end_row> --skip-graded
 ```
 
-Set`<start_row>` and `<end_row>` with the range of rows you want to grade. If you don't want to skip already graded rows, you can omit the `--skip_graded` flag.
+Set`<start_row>` and `<end_row>` with the range of rows you want to grade. If you don't want to skip already graded rows, you can omit the `--skip-graded` flag.
 
 In the interactive viewer, you can use the following commands:
 
@@ -48,7 +48,7 @@ The script will then save the current progress in a temporary csv file (even if 
 
 In the end the script will overwrite the original file with the graded rows. This will always be the same file and file type as the original file.
 
-If you quit the interactive viewer, you can resume your progress by running the script again with the same arguments, using the `--skip_graded` flag to skip already graded rows.
+If you quit the interactive viewer, you can resume your progress by running the script again with the same arguments, using the `--skip-graded` flag to skip already graded rows.
 
 To avoid corrupting the data file make sure to not use `Ctrl+C` to quit the interactive viewer, instead use the `q` command.
 
